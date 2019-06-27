@@ -3,7 +3,6 @@
 Created by Kirk Ryan - @kirk__ryan / kirk.ryan@netapp.com
 
 A simple to use Azure NetApp Files snapshot scheduler built upon Azure Logic Apps
-![Snapshots taken with ANF Scheduler](Screenshots/anfSnapshotList.png)
 
 ## Introduction
 This Azure Netapp Files snapshot scheduler allows you to take snapshots at any supported interval i.e. daily, hourly. etc and automatically manages snapshot retention for the specified number of snapshots.
