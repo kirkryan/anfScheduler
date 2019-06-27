@@ -2,7 +2,7 @@
 # Azure NetApp Files Snapshot Scheduler
 Created by Kirk Ryan - @kirk__ryan / kirk.ryan@netapp.com
 
-A simple to use Azure NetApp Files scheduler built upon Azure Logic Apps
+A simple to use Azure NetApp Files snapshot scheduler built upon Azure Logic Apps
 ![Snapshots taken with ANF Scheduler](Screenshots/anfScheduler-SnapshotList.png)
 
 ## Introduction
