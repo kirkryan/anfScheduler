@@ -43,7 +43,7 @@ Once you have the above information to hand you will need to populate those valu
 6. That's it, the ANF scheduler now has the correct permissions to create and delete snapshots for your given volume.
 
 #### Step 3: Customise the Logic App to your ANF environment
-1. Navigate back to your logic app - you will now need to enter your specific environmental variables such as resource group, volume name, etc. To do so, simply each User Configuration heading (purple) and enter your values into the value field ![Enter your own values for each User configuration item](Screenshots/logicAppDesigner.png)
+1. Navigate back to your logic app and click the "designer" button on the top bar - you will now need to enter your specific environmental variables such as resource group, volume name, etc. To do so, simply each User Configuration heading (purple) and enter your values into the value field ![Enter your own values for each User configuration item](Screenshots/logicAppDesigner.png)
 2. Remain on this page, you'll need it for the next and final step
 
 #### Step 4: Set your schedule and retention
