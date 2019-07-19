@@ -3,8 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workflows_Scheduler_ANF_Snapshots_v1_name": {
-      "value": "Scheduler-ANF-Snapshots-v1",
-      "type": "String"
+      "value": "Scheduler-ANF-Snapshots-v1"
     }
   }
 }
