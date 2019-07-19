@@ -11,7 +11,7 @@ The scheduler will create snapshots at the interval and frequency that you speci
 
 ## Installation & Configuration
 ### Installation
-Simply clone/download this repository. It contains the ARM template and deployment scripts in order to deploy ANF Scheduler to your environment. The deployment can be run with deploy.ps1 or deploy.sh. **Important** Deploy.ps1 uses PowerShell 2.0.69 (same as Azure Cloud Shell). If you use a more up-to-date PowerShell module i.e. 2.4.0 the script will error. Use the deploy.sh instead as a workaround or deploy using cloud shell. An updated PowerShell Deploy.sh is in progress.
+Simply clone/download this repository. It contains the ARM template and deployment scripts in order to deploy ANF Scheduler to your environment. The deployment can be run with deploy.ps1 (for Azure Cloud Shell), deploy-AzModule.ps1 (for Azure Powershell) or deploy.sh (Azure CLI).
 ![Install Directory Files](Screenshots/InstallFilesScreenshot.png)
 
 ### Configuration
@@ -59,4 +59,4 @@ Here are some known errors you may encounter commonly caused by misconfiguration
 Answer: You have not enabled the managed identity in Step 2. Please enable and try again
 
 #### The term "Login-AzureRmAccount is not recognized".....
-Answer: You are using PowerShell module > 2.0.69 i.e. 2.4.0. Use the deploy.sh with Azure CLI or run the PowerShell command in an Azure Shell as this is the default version in use. A fix for more modern PowerShell modules is in progress. Watch this repo to be automatically notified upon release.
+Answer: You are using PowerShell module > 2.0.69 i.e. 2.4.0. Use the deploy-AzModule.ps1 instead of deploy.ps1.
