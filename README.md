@@ -14,6 +14,9 @@ The scheduler will create snapshots at the interval and frequency that you speci
 Simply clone/download this repository. It contains the ARM template and deployment scripts in order to deploy ANF Scheduler to your environment. The deployment can be run with deploy.ps1 (for Azure Cloud Shell), deploy-AzModule.ps1 (for Azure Powershell) or deploy.sh (Azure CLI).
 ![Install Directory Files](Screenshots/InstallFilesScreenshot.png)
 
+Note: You may change the name and location of the Azure logic app by editing the appropriate values in the parameters.json
+![Parameters](Screenshots/parameters.png)
+
 ### Configuration
 Once you have installed the template you **must** configure the anfScheduler logic app to be able to access your Azure NetApp Files resources. Please note, that anfScheduler has **no access to your data** and operates entirely at the management API level.
 
@@ -60,3 +63,7 @@ Answer: You have not enabled the managed identity in Step 2. Please enable and t
 
 #### The term "Login-AzureRmAccount is not recognized".....
 Answer: You are using PowerShell module > 2.0.69 i.e. 2.4.0. Use the deploy-AzModule.ps1 instead of deploy.ps1.
+
+
+#### Connect-AzAccount : Access to the path '/Users/yourusername/.Azure/AzureRmContext.json' is denied.
+Answer: You do not have sufficient user priviliges on your client. Restart PowerShell as admin (windows) or sudo (linux/unix/macOS) and try again.

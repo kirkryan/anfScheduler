@@ -36,7 +36,7 @@ param(
     [string]
     $resourceGroupLocation,
 
-    [Parameter(Mandatory = $True)]
+    #[Parameter(Mandatory = $True)]
     [string]
     $deploymentName,
 
@@ -65,6 +65,11 @@ Function RegisterRP {
 # Execution begins here
 #******************************************************************************
 $ErrorActionPreference = "Stop"
+
+# auto-generate deployment name to simply deployment for users
+$deploymentPrefix = "Scheduler-ANF-Snapshots-v1-"
+$deploymentTime = Get-Date -format "yyyyMMddhhmmss"
+$deploymentName = $deploymentPrefix + $deploymentTime
 
 # welcome user
 Write-Host "Welcome to ANF Snapshot Scheduler!";
@@ -101,7 +106,11 @@ else {
     Write-Host "Using existing resource group '$resourceGroupName'";
 }
 
-# Start the deployment
+#$Objects = az account list-locations | ConvertFrom-Json
+#Write-Host "Specify the region you would like to deploy the scheduler within:"
+#Write-Host "For your reference, the regions are: '$Objects.name'" -ForegroundColor Green
+#Read-Host "deployment_Region"# Start the deployment
+
 Write-Host "Starting deployment...";
 if (Test-Path $parametersFilePath) {
     New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -Name $deploymentName -TemplateFile $templateFilePath -TemplateParameterFile $parametersFilePath;

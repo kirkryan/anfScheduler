@@ -4,7 +4,11 @@
     "parameters": {
         "workflows_Scheduler_ANF_Snapshots_v1_name": {
             "defaultValue": "Scheduler-ANF-Snapshots-v1",
-            "type": "String"
+            "type": "string"
+        },
+        "deployment_Region": {
+            "defaultValue": "northeurope",
+            "type":"string"
         }
     },
     "variables": {},
@@ -13,7 +17,7 @@
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
             "name": "[parameters('workflows_Scheduler_ANF_Snapshots_v1_name')]",
-            "location": "northeurope",
+            "location": "[parameters('deployment_Region')]",
             "identity": {
                 "principalId": null,
                 "tenantId": null,
