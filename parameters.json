@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "workflows_Scheduler_ANF_Snapshots_v1_name": {
-      "value": "Scheduler-ANF-Snapshots-v2"
+      "value": "Scheduler-ANF-Snapshots-v1"
     },
     "deployment_Region": {
-      "value": "westeurope"
+      "value": "northeurope"
     }
   }
 }
