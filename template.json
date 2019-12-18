@@ -151,9 +151,6 @@
                                                                     "ruleIndex",
                                                                     "unixReadOnly",
                                                                     "unixReadWrite",
-                                                                    "cifs",
-                                                                    "nfsv3",
-                                                                    "nfsv4",
                                                                     "allowedClients"
                                                                 ],
                                                                 "type": "object"
@@ -320,9 +317,6 @@
                                                                     "ruleIndex",
                                                                     "unixReadOnly",
                                                                     "unixReadWrite",
-                                                                    "cifs",
-                                                                    "nfsv3",
-                                                                    "nfsv4",
                                                                     "allowedClients"
                                                                 ],
                                                                 "type": "object"
