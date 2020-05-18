@@ -2,13 +2,9 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_Scheduler_ANF_Snapshots_v1_name": {
-            "defaultValue": "Scheduler-ANF-Snapshots-v1",
-            "type": "string"
-        },
-        "deployment_Region": {
-            "defaultValue": "northeurope",
-            "type":"string"
+        "workflows_Scheduler_ANF_Snapshots_v2_Release_name": {
+            "defaultValue": "Scheduler-ANF-Snapshots-v2-Release",
+            "type": "String"
         }
     },
     "variables": {},
@@ -16,13 +12,8 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_Scheduler_ANF_Snapshots_v1_name')]",
-            "location": "[parameters('deployment_Region')]",
-            "identity": {
-                "principalId": null,
-                "tenantId": null,
-                "type": "SystemAssigned"
-            },
+            "name": "[parameters('workflows_Scheduler_ANF_Snapshots_v2_Release_name')]",
+            "location": "westeurope",
             "properties": {
                 "state": "Enabled",
                 "definition": {
@@ -34,549 +25,37 @@
                             "recurrence": {
                                 "frequency": "Day",
                                 "interval": 1,
-                                "startTime": "2019-06-27T18:00:00.000Z",
+                                "startTime": "2019-06-27T18:00:00Z",
                                 "timeZone": "GMT Standard Time"
                             },
                             "type": "Recurrence"
                         }
                     },
                     "actions": {
-                        "Get_the_target_volume_and_retrieve_the_fileSystemId_(Azure_NetApp_Files_API)": {
-                            "runAfter": {
-                                "Initialize_variable_-_firstSnapshot": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "authentication": {
-                                    "audience": "https://management.azure.com/",
-                                    "type": "ManagedServiceIdentity"
-                                },
-                                "method": "GET",
-                                "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{variables('volName')}?api-version=2017-08-15"
-                            },
-                            "description": "Get the target volume and retrieve the fileSystemId"
-                        },
-                        "Initialize_variable_-_firstSnapshot": {
-                            "runAfter": {
-                                "User_Configuration_-_Snapshot_Retention": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "firstSnapshot",
-                                        "type": "String"
-                                    }
-                                ]
-                            }
-                        },
-                        "List_snapshots_on_the_target_volume_(Azure_NetApp_Files_API)": {
-                            "runAfter": {
-                                "Parse_JSON_-_Volume_Response_Body": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "authentication": {
-                                    "type": "ManagedServiceIdentity"
-                                },
-                                "method": "GET",
-                                "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{variables('volName')}?api-version=2017-08-15"
-                            }
-                        },
-                        "Parse_JSON_-_Snapshots_Response_Body": {
-                            "runAfter": {
-                                "List_snapshots_on_the_target_volume_(Azure_NetApp_Files_API)": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ParseJson",
-                            "inputs": {
-                                "content": "@body('List_snapshots_on_the_target_volume_(Azure_NetApp_Files_API)')",
-                                "schema": {
-                                    "properties": {
-                                        "etag": {
-                                            "type": "string"
-                                        },
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "location": {
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "properties": {
-                                            "properties": {
-                                                "baremetalTenantId": {
-                                                    "type": "string"
-                                                },
-                                                "creationToken": {
-                                                    "type": "string"
-                                                },
-                                                "exportPolicy": {
-                                                    "properties": {
-                                                        "rules": {
-                                                            "items": {
-                                                                "properties": {
-                                                                    "allowedClients": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "cifs": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "nfsv3": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "nfsv4": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "ruleIndex": {
-                                                                        "type": "integer"
-                                                                    },
-                                                                    "unixReadOnly": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "unixReadWrite": {
-                                                                        "type": "boolean"
-                                                                    }
-                                                                },
-                                                                "required": [
-                                                                    "ruleIndex",
-                                                                    "unixReadOnly",
-                                                                    "unixReadWrite",
-                                                                    "allowedClients"
-                                                                ],
-                                                                "type": "object"
-                                                            },
-                                                            "type": "array"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "fileSystemId": {
-                                                    "type": "string"
-                                                },
-                                                "mountTargets": {
-                                                    "items": {
-                                                        "properties": {
-                                                            "endIp": {
-                                                                "type": "string"
-                                                            },
-                                                            "fileSystemId": {
-                                                                "type": "string"
-                                                            },
-                                                            "gateway": {
-                                                                "type": "string"
-                                                            },
-                                                            "ipAddress": {
-                                                                "type": "string"
-                                                            },
-                                                            "mountTargetId": {
-                                                                "type": "string"
-                                                            },
-                                                            "netmask": {
-                                                                "type": "string"
-                                                            },
-                                                            "provisioningState": {
-                                                                "type": "string"
-                                                            },
-                                                            "startIp": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "required": [
-                                                            "provisioningState",
-                                                            "mountTargetId",
-                                                            "fileSystemId",
-                                                            "startIp",
-                                                            "endIp",
-                                                            "gateway",
-                                                            "netmask",
-                                                            "ipAddress"
-                                                        ],
-                                                        "type": "object"
-                                                    },
-                                                    "type": "array"
-                                                },
-                                                "name": {
-                                                    "type": "string"
-                                                },
-                                                "ownerId": {
-                                                    "type": "string"
-                                                },
-                                                "protocolTypes": {
-                                                    "items": {
-                                                        "type": "string"
-                                                    },
-                                                    "type": "array"
-                                                },
-                                                "provisioningState": {
-                                                    "type": "string"
-                                                },
-                                                "serviceLevel": {
-                                                    "type": "string"
-                                                },
-                                                "snapshotPolicy": {
-                                                    "properties": {
-                                                        "enabled": {
-                                                            "type": "boolean"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "subnetId": {
-                                                    "type": "string"
-                                                },
-                                                "usageThreshold": {
-                                                    "type": "integer"
-                                                },
-                                                "usedBytes": {
-                                                    "type": "integer"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "tags": {
-                                            "properties": {},
-                                            "type": "object"
-                                        },
-                                        "type": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        },
-                        "Parse_JSON_-_Volume_Response_Body": {
-                            "runAfter": {
-                                "Get_the_target_volume_and_retrieve_the_fileSystemId_(Azure_NetApp_Files_API)": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ParseJson",
-                            "inputs": {
-                                "content": "@body('Get_the_target_volume_and_retrieve_the_fileSystemId_(Azure_NetApp_Files_API)')",
-                                "schema": {
-                                    "properties": {
-                                        "etag": {
-                                            "type": "string"
-                                        },
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "location": {
-                                            "type": "string"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        },
-                                        "properties": {
-                                            "properties": {
-                                                "baremetalTenantId": {
-                                                    "type": "string"
-                                                },
-                                                "creationToken": {
-                                                    "type": "string"
-                                                },
-                                                "exportPolicy": {
-                                                    "properties": {
-                                                        "rules": {
-                                                            "items": {
-                                                                "properties": {
-                                                                    "allowedClients": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "cifs": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "nfsv3": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "nfsv4": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "ruleIndex": {
-                                                                        "type": "integer"
-                                                                    },
-                                                                    "unixReadOnly": {
-                                                                        "type": "boolean"
-                                                                    },
-                                                                    "unixReadWrite": {
-                                                                        "type": "boolean"
-                                                                    }
-                                                                },
-                                                                "required": [
-                                                                    "ruleIndex",
-                                                                    "unixReadOnly",
-                                                                    "unixReadWrite",
-                                                                    "allowedClients"
-                                                                ],
-                                                                "type": "object"
-                                                            },
-                                                            "type": "array"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "fileSystemId": {
-                                                    "type": "string"
-                                                },
-                                                "mountTargets": {
-                                                    "items": {
-                                                        "properties": {
-                                                            "endIp": {
-                                                                "type": "string"
-                                                            },
-                                                            "fileSystemId": {
-                                                                "type": "string"
-                                                            },
-                                                            "gateway": {
-                                                                "type": "string"
-                                                            },
-                                                            "ipAddress": {
-                                                                "type": "string"
-                                                            },
-                                                            "mountTargetId": {
-                                                                "type": "string"
-                                                            },
-                                                            "netmask": {
-                                                                "type": "string"
-                                                            },
-                                                            "provisioningState": {
-                                                                "type": "string"
-                                                            },
-                                                            "startIp": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "required": [
-                                                            "provisioningState",
-                                                            "mountTargetId",
-                                                            "fileSystemId",
-                                                            "startIp",
-                                                            "endIp",
-                                                            "gateway",
-                                                            "netmask",
-                                                            "ipAddress"
-                                                        ],
-                                                        "type": "object"
-                                                    },
-                                                    "type": "array"
-                                                },
-                                                "name": {
-                                                    "type": "string"
-                                                },
-                                                "ownerId": {
-                                                    "type": "string"
-                                                },
-                                                "protocolTypes": {
-                                                    "items": {
-                                                        "type": "string"
-                                                    },
-                                                    "type": "array"
-                                                },
-                                                "provisioningState": {
-                                                    "type": "string"
-                                                },
-                                                "serviceLevel": {
-                                                    "type": "string"
-                                                },
-                                                "snapshotPolicy": {
-                                                    "properties": {
-                                                        "enabled": {
-                                                            "type": "boolean"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                },
-                                                "subnetId": {
-                                                    "type": "string"
-                                                },
-                                                "usageThreshold": {
-                                                    "type": "integer"
-                                                },
-                                                "usedBytes": {
-                                                    "type": "integer"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "tags": {
-                                            "properties": {},
-                                            "type": "object"
-                                        },
-                                        "type": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        },
-                        "Scheduler_House-Keeping_Logic": {
+                        "Check_for_final_job_status_and_report_status": {
                             "actions": {
-                                "Condition": {
-                                    "actions": {
-                                        "Delete_Older_Snapshot(s)_(Azure_NetApp_Files_API)": {
-                                            "runAfter": {},
-                                            "type": "Http",
-                                            "inputs": {
-                                                "authentication": {
-                                                    "type": "ManagedServiceIdentity"
-                                                },
-                                                "method": "DELETE",
-                                                "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{variables('volName')}/snapshots/@{variables('firstSnapshot')}?api-version=2017-08-15"
-                                            }
-                                        },
-                                        "Terminate_-_Successfully_removed_older_snapshots": {
-                                            "runAfter": {
-                                                "Delete_Older_Snapshot(s)_(Azure_NetApp_Files_API)": [
-                                                    "Succeeded"
-                                                ]
-                                            },
-                                            "type": "Terminate",
-                                            "inputs": {
-                                                "runStatus": "Succeeded"
-                                            }
-                                        }
-                                    },
-                                    "runAfter": {
-                                        "Set_variable_-_firstSnapshot": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "else": {
-                                        "actions": {
-                                            "Terminate_successfully_-_No_snapshots_to_remove": {
-                                                "runAfter": {},
-                                                "type": "Terminate",
-                                                "inputs": {
-                                                    "runStatus": "Succeeded"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "expression": {
-                                        "and": [
-                                            {
-                                                "greaterOrEquals": [
-                                                    "@length(body('Parse_JSON_-_Post_Snapshot_Response_Body')?['value'])",
-                                                    "@variables('snapshotRetention')"
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    "type": "If"
-                                },
-                                "Get_list_of_snapshots_from_Target_Volume_(Post-Success)": {
+                                "Terminate": {
                                     "runAfter": {},
-                                    "type": "Http",
+                                    "type": "Terminate",
                                     "inputs": {
-                                        "authentication": {
-                                            "type": "ManagedServiceIdentity"
-                                        },
-                                        "method": "GET",
-                                        "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{variables('volName')}/snapshots?api-version=2017-08-15"
-                                    }
-                                },
-                                "Parse_JSON_-_Post_Snapshot_Response_Body": {
-                                    "runAfter": {
-                                        "Get_list_of_snapshots_from_Target_Volume_(Post-Success)": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "ParseJson",
-                                    "inputs": {
-                                        "content": "@body('Get_list_of_snapshots_from_Target_Volume_(Post-Success)')",
-                                        "schema": {
-                                            "properties": {
-                                                "value": {
-                                                    "items": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "string"
-                                                            },
-                                                            "location": {
-                                                                "type": "string"
-                                                            },
-                                                            "name": {
-                                                                "type": "string"
-                                                            },
-                                                            "properties": {
-                                                                "properties": {
-                                                                    "created": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "fileSystemId": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "name": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "provisioningState": {
-                                                                        "type": "string"
-                                                                    },
-                                                                    "snapshotId": {
-                                                                        "type": "string"
-                                                                    }
-                                                                },
-                                                                "type": "object"
-                                                            },
-                                                            "type": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "required": [
-                                                            "id",
-                                                            "name",
-                                                            "type",
-                                                            "location",
-                                                            "properties"
-                                                        ],
-                                                        "type": "object"
-                                                    },
-                                                    "type": "array"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    }
-                                },
-                                "Set_variable_-_firstSnapshot": {
-                                    "runAfter": {
-                                        "Parse_JSON_-_Post_Snapshot_Response_Body": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "SetVariable",
-                                    "inputs": {
-                                        "name": "firstSnapshot",
-                                        "value": "@{body('Parse_JSON_-_Post_Snapshot_Response_Body')?['value']?[0]?['properties']?['name']}"
+                                        "runStatus": "Succeeded"
                                     }
                                 }
                             },
                             "runAfter": {
-                                "Take_snapshot_on_the_target_volume_(Azure_NetApp_Files_API)": [
+                                "For_each_ANF_volume_-_Run_logic": [
                                     "Succeeded"
                                 ]
                             },
                             "else": {
                                 "actions": {
-                                    "Terminate": {
+                                    "Terminate_and_report_error": {
                                         "runAfter": {},
                                         "type": "Terminate",
                                         "inputs": {
                                             "runError": {
-                                                "code": "999",
-                                                "message": "Scheduler could not create a snapshot at this time. The Azure API did not return a successful status of 201. Please try again later."
+                                                "code": "201",
+                                                "message": "@variables('errorMessage')"
                                             },
                                             "runStatus": "Failed"
                                         }
@@ -587,33 +66,699 @@
                                 "and": [
                                     {
                                         "equals": [
-                                            "@outputs('Take_snapshot_on_the_target_volume_(Azure_NetApp_Files_API)')['statusCode']",
-                                            201
+                                            "@variables('stateOK')",
+                                            true
                                         ]
                                     }
                                 ]
                             },
                             "type": "If"
                         },
-                        "Take_snapshot_on_the_target_volume_(Azure_NetApp_Files_API)": {
+                        "For_each_ANF_volume_-_Run_logic": {
+                            "foreach": "@variables('volName')",
+                            "actions": {
+                                "HTTP_-_Create_snapshot_on_target_ANF_volume": {
+                                    "runAfter": {
+                                        "Parse_JSON_-_Get_snapshots_on_the_target_volume": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "authentication": {
+                                            "type": "ManagedServiceIdentity"
+                                        },
+                                        "body": {
+                                            "location": "@body('Parse_JSON_-_Get_snapshots_on_the_target_volume')?['location']",
+                                            "properties": {
+                                                "fileSystemId": "@body('Parse_JSON_-_Get_snapshots_on_the_target_volume')?['properties']?['fileSystemId']"
+                                            }
+                                        },
+                                        "method": "PUT",
+                                        "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}/snapshots/@{variables('snapshotPrefix')}-@{ticks(utcNow())}?api-version=2019-11-01"
+                                    }
+                                },
+                                "HTTP_-_Get_snapshots_on_the_target_volume": {
+                                    "runAfter": {
+                                        "Parse_JSON_-_Retrieve_target_volume_fileSystemId": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "authentication": {
+                                            "type": "ManagedServiceIdentity"
+                                        },
+                                        "method": "GET",
+                                        "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}?api-version=2017-08-15"
+                                    }
+                                },
+                                "HTTP_-_Retrieve_target_volume_fileSystemId": {
+                                    "runAfter": {},
+                                    "type": "Http",
+                                    "inputs": {
+                                        "authentication": {
+                                            "audience": "https://management.azure.com/",
+                                            "type": "ManagedServiceIdentity"
+                                        },
+                                        "method": "GET",
+                                        "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}?api-version=2017-08-15"
+                                    }
+                                },
+                                "Parse_JSON_-_Get_snapshots_on_the_target_volume": {
+                                    "runAfter": {
+                                        "HTTP_-_Get_snapshots_on_the_target_volume": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('HTTP_-_Get_snapshots_on_the_target_volume')",
+                                        "schema": {
+                                            "properties": {
+                                                "etag": {
+                                                    "type": "string"
+                                                },
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "location": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "properties": {
+                                                    "properties": {
+                                                        "baremetalTenantId": {
+                                                            "type": "string"
+                                                        },
+                                                        "creationToken": {
+                                                            "type": "string"
+                                                        },
+                                                        "exportPolicy": {
+                                                            "properties": {
+                                                                "rules": {
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "allowedClients": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "cifs": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "nfsv3": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "nfsv4": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "ruleIndex": {
+                                                                                "type": "integer"
+                                                                            },
+                                                                            "unixReadOnly": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "unixReadWrite": {
+                                                                                "type": "boolean"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "ruleIndex",
+                                                                            "unixReadOnly",
+                                                                            "unixReadWrite",
+                                                                            "allowedClients"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "type": "array"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "fileSystemId": {
+                                                            "type": "string"
+                                                        },
+                                                        "mountTargets": {
+                                                            "items": {
+                                                                "properties": {
+                                                                    "endIp": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "fileSystemId": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "gateway": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "ipAddress": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "mountTargetId": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "netmask": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "provisioningState": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "startIp": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "provisioningState",
+                                                                    "mountTargetId",
+                                                                    "fileSystemId",
+                                                                    "startIp",
+                                                                    "endIp",
+                                                                    "gateway",
+                                                                    "netmask",
+                                                                    "ipAddress"
+                                                                ],
+                                                                "type": "object"
+                                                            },
+                                                            "type": "array"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "ownerId": {
+                                                            "type": "string"
+                                                        },
+                                                        "protocolTypes": {
+                                                            "items": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": "array"
+                                                        },
+                                                        "provisioningState": {
+                                                            "type": "string"
+                                                        },
+                                                        "serviceLevel": {
+                                                            "type": "string"
+                                                        },
+                                                        "snapshotPolicy": {
+                                                            "properties": {
+                                                                "enabled": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "subnetId": {
+                                                            "type": "string"
+                                                        },
+                                                        "usageThreshold": {
+                                                            "type": "integer"
+                                                        },
+                                                        "usedBytes": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "tags": {
+                                                    "properties": {},
+                                                    "type": "object"
+                                                },
+                                                "type": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "Parse_JSON_-_Retrieve_target_volume_fileSystemId": {
+                                    "runAfter": {
+                                        "HTTP_-_Retrieve_target_volume_fileSystemId": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('HTTP_-_Retrieve_target_volume_fileSystemId')",
+                                        "schema": {
+                                            "properties": {
+                                                "etag": {
+                                                    "type": "string"
+                                                },
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "location": {
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                },
+                                                "properties": {
+                                                    "properties": {
+                                                        "baremetalTenantId": {
+                                                            "type": "string"
+                                                        },
+                                                        "creationToken": {
+                                                            "type": "string"
+                                                        },
+                                                        "exportPolicy": {
+                                                            "properties": {
+                                                                "rules": {
+                                                                    "items": {
+                                                                        "properties": {
+                                                                            "allowedClients": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "cifs": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "nfsv3": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "nfsv4": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "ruleIndex": {
+                                                                                "type": "integer"
+                                                                            },
+                                                                            "unixReadOnly": {
+                                                                                "type": "boolean"
+                                                                            },
+                                                                            "unixReadWrite": {
+                                                                                "type": "boolean"
+                                                                            }
+                                                                        },
+                                                                        "required": [
+                                                                            "ruleIndex",
+                                                                            "unixReadOnly",
+                                                                            "unixReadWrite",
+                                                                            "allowedClients"
+                                                                        ],
+                                                                        "type": "object"
+                                                                    },
+                                                                    "type": "array"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "fileSystemId": {
+                                                            "type": "string"
+                                                        },
+                                                        "mountTargets": {
+                                                            "items": {
+                                                                "properties": {
+                                                                    "endIp": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "fileSystemId": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "gateway": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "ipAddress": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "mountTargetId": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "netmask": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "provisioningState": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "startIp": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "provisioningState",
+                                                                    "mountTargetId",
+                                                                    "fileSystemId",
+                                                                    "startIp",
+                                                                    "endIp",
+                                                                    "gateway",
+                                                                    "netmask",
+                                                                    "ipAddress"
+                                                                ],
+                                                                "type": "object"
+                                                            },
+                                                            "type": "array"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "ownerId": {
+                                                            "type": "string"
+                                                        },
+                                                        "protocolTypes": {
+                                                            "items": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": "array"
+                                                        },
+                                                        "provisioningState": {
+                                                            "type": "string"
+                                                        },
+                                                        "serviceLevel": {
+                                                            "type": "string"
+                                                        },
+                                                        "snapshotPolicy": {
+                                                            "properties": {
+                                                                "enabled": {
+                                                                    "type": "boolean"
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        },
+                                                        "subnetId": {
+                                                            "type": "string"
+                                                        },
+                                                        "usageThreshold": {
+                                                            "type": "integer"
+                                                        },
+                                                        "usedBytes": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "tags": {
+                                                    "properties": {},
+                                                    "type": "object"
+                                                },
+                                                "type": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "Scheduler_House_Keeping_Logic_v2": {
+                                    "actions": {
+                                        "Condition_-_Check_if_snapshots_exceed_retention": {
+                                            "actions": {
+                                                "HTTP": {
+                                                    "runAfter": {},
+                                                    "type": "Http",
+                                                    "inputs": {
+                                                        "authentication": {
+                                                            "type": "ManagedServiceIdentity"
+                                                        },
+                                                        "method": "DELETE",
+                                                        "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}/snapshots/@{first(variables('scopedSnapshotArray'))}?api-version=2019-11-01"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter": {
+                                                "Set_variable_-_Set_in_scope_snapshots_only": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "expression": {
+                                                "and": [
+                                                    {
+                                                        "greater": [
+                                                            "@length(variables('scopedSnapshotArray'))",
+                                                            "@variables('snapshotRetention')"
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "type": "If"
+                                        },
+                                        "Filter_array_-_Scope_snapshot_actions_to_matching_scheduler_prefix_only": {
+                                            "runAfter": {
+                                                "For_each_-_Store_all_snapshots_on_target_volume_in_the_array": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Query",
+                                            "inputs": {
+                                                "from": "@variables('snapshotArray')",
+                                                "where": "@contains(item(), variables('snapshotPrefix'))"
+                                            }
+                                        },
+                                        "For_each_-_Store_all_snapshots_on_target_volume_in_the_array": {
+                                            "foreach": "@body('Parse_JSON_-_Get_all_snapshots_on_target_volume')?['value']",
+                                            "actions": {
+                                                "Append_to_array_variable": {
+                                                    "runAfter": {},
+                                                    "type": "AppendToArrayVariable",
+                                                    "inputs": {
+                                                        "name": "snapshotArray",
+                                                        "value": "@items('For_each_-_Store_all_snapshots_on_target_volume_in_the_array')?['properties']?['name']"
+                                                    }
+                                                }
+                                            },
+                                            "runAfter": {
+                                                "Parse_JSON_-_Get_all_snapshots_on_target_volume": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "Foreach",
+                                            "runtimeConfiguration": {
+                                                "concurrency": {
+                                                    "repetitions": 1
+                                                }
+                                            }
+                                        },
+                                        "HTTP_-_Get_all_snapshots_on_target_volume": {
+                                            "runAfter": {},
+                                            "type": "Http",
+                                            "inputs": {
+                                                "authentication": {
+                                                    "type": "ManagedServiceIdentity"
+                                                },
+                                                "method": "GET",
+                                                "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}/snapshots?api-version=2019-11-01"
+                                            }
+                                        },
+                                        "Parse_JSON_-_Get_all_snapshots_on_target_volume": {
+                                            "runAfter": {
+                                                "HTTP_-_Get_all_snapshots_on_target_volume": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "ParseJson",
+                                            "inputs": {
+                                                "content": "@body('HTTP_-_Get_all_snapshots_on_target_volume')",
+                                                "schema": {
+                                                    "properties": {
+                                                        "value": {
+                                                            "items": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "location": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "properties": {
+                                                                        "properties": {
+                                                                            "created": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "fileSystemId": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "name": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "provisioningState": {
+                                                                                "type": "string"
+                                                                            },
+                                                                            "snapshotId": {
+                                                                                "type": "string"
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    },
+                                                                    "type": {
+                                                                        "type": "string"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "name",
+                                                                    "type",
+                                                                    "location",
+                                                                    "properties"
+                                                                ],
+                                                                "type": "object"
+                                                            },
+                                                            "type": "array"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "Set_variable_-_Clear_scoped_snapshotsArray": {
+                                            "runAfter": {
+                                                "Condition_-_Check_if_snapshots_exceed_retention": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "scopedSnapshotArray",
+                                                "value": []
+                                            }
+                                        },
+                                        "Set_variable_-_Set_in_scope_snapshots_only": {
+                                            "runAfter": {
+                                                "Filter_array_-_Scope_snapshot_actions_to_matching_scheduler_prefix_only": [
+                                                    "Succeeded"
+                                                ]
+                                            },
+                                            "type": "SetVariable",
+                                            "inputs": {
+                                                "name": "scopedSnapshotArray",
+                                                "value": "@body('Filter_array_-_Scope_snapshot_actions_to_matching_scheduler_prefix_only')"
+                                            }
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "HTTP_-_Create_snapshot_on_target_ANF_volume": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "else": {
+                                        "actions": {
+                                            "Report_error_message_to_runtime": {
+                                                "runAfter": {
+                                                    "Report_error_status_to_runtime": [
+                                                        "Succeeded"
+                                                    ]
+                                                },
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "errorMessage",
+                                                    "value": "Snapshot generation failed on the following volume: @{items('For_each_ANF_volume_-_Run_logic')}. Check the logs for more information"
+                                                }
+                                            },
+                                            "Report_error_status_to_runtime": {
+                                                "runAfter": {},
+                                                "type": "SetVariable",
+                                                "inputs": {
+                                                    "name": "stateOK",
+                                                    "value": false
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "expression": {
+                                        "and": [
+                                            {
+                                                "equals": [
+                                                    "@outputs('HTTP_-_Create_snapshot_on_target_ANF_volume')['statusCode']",
+                                                    201
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    "type": "If"
+                                }
+                            },
                             "runAfter": {
-                                "Parse_JSON_-_Snapshots_Response_Body": [
+                                "Initialize_variable_-_errorMessage_[DO_NOT_EDIT]": [
                                     "Succeeded"
                                 ]
                             },
-                            "type": "Http",
+                            "type": "Foreach",
+                            "runtimeConfiguration": {
+                                "concurrency": {
+                                    "repetitions": 1
+                                }
+                            }
+                        },
+                        "Initialize_variable_-_Scoped_Snapshot_Array_-_[DO_NOT_EDIT]": {
+                            "runAfter": {
+                                "Initialize_variable_-_Snapshot_Array_-_[DO_NOT_EDIT]": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
                             "inputs": {
-                                "authentication": {
-                                    "type": "ManagedServiceIdentity"
-                                },
-                                "body": {
-                                    "location": "@body('Parse_JSON_-_Volume_Response_Body')?['location']",
-                                    "properties": {
-                                        "fileSystemId": "@body('Parse_JSON_-_Volume_Response_Body')?['properties']?['fileSystemId']"
+                                "variables": [
+                                    {
+                                        "name": "scopedSnapshotArray",
+                                        "type": "array"
                                     }
-                                },
-                                "method": "PUT",
-                                "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{variables('volName')}/snapshots/scheduler-@{ticks(utcNow())}?api-version=2017-08-15"
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_Snapshot_Array_-_[DO_NOT_EDIT]": {
+                            "runAfter": {
+                                "Initialize_variable_-_firstSnapshot_[DO_NOT_EDIT]": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "snapshotArray",
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_errorMessage_[DO_NOT_EDIT]": {
+                            "runAfter": {
+                                "Initialize_variable_-_state_[DO_NOT_EDIT]": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "errorMessage",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_firstSnapshot_[DO_NOT_EDIT]": {
+                            "runAfter": {
+                                "User_Configuration_-_Snapshot_Retention": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "snapshotItem",
+                                        "type": "integer",
+                                        "value": 0
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_-_state_[DO_NOT_EDIT]": {
+                            "runAfter": {
+                                "Initialize_variable_-_Scoped_Snapshot_Array_-_[DO_NOT_EDIT]": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "stateOK",
+                                        "type": "boolean",
+                                        "value": true
+                                    }
+                                ]
                             }
                         },
                         "User_Configuration_-_Capacity_Pool": {
@@ -664,9 +809,26 @@
                                 ]
                             }
                         },
+                        "User_Configuration_-_Snapshot_Prefix": {
+                            "runAfter": {
+                                "User_Configuration_-_Volume(s)_Name": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "snapshotPrefix",
+                                        "type": "string",
+                                        "value": "daily"
+                                    }
+                                ]
+                            }
+                        },
                         "User_Configuration_-_Snapshot_Retention": {
                             "runAfter": {
-                                "User_Configuration_-_Volume_Name": [
+                                "User_Configuration_-_Snapshot_Prefix": [
                                     "Succeeded"
                                 ]
                             },
@@ -693,7 +855,7 @@
                                 ]
                             }
                         },
-                        "User_Configuration_-_Volume_Name": {
+                        "User_Configuration_-_Volume(s)_Name": {
                             "runAfter": {
                                 "User_Configuration_-_Capacity_Pool": [
                                     "Succeeded"
@@ -704,7 +866,8 @@
                                 "variables": [
                                     {
                                         "name": "volName",
-                                        "type": "String"
+                                        "type": "array",
+                                        "value": []
                                     }
                                 ]
                             }
