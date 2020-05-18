@@ -54,14 +54,6 @@ Once you have the above information to hand you will need to populate those valu
 5. Select your managed identity: ![Add Owner Role Assignment](Screenshots/AddOwnerRoleAssignment.png)
 6. That's it, the ANF scheduler now has the correct permissions to create and delete snapshots for your given volume.
 
-#### Step 3: Customise the Logic App to your ANF environment
-1. Navigate back to your logic app and click the "designer" button on the top bar - you will now need to enter your specific environmental variables such as resource group, volume name, etc. To do so, simply each User Configuration heading (purple) and enter your values into the value field ![Enter your own values for each User configuration item](Screenshots/logicAppDesigner.png)
-2. Remain on this page, you'll need it for the next and final step
-
-#### Step 4: Set your schedule and retention
-1. By default the logic app is configured to take a daily snapshot and retain 7 days before removing the oldest snapshot. If you would like to configure any of the parameters simple select the recurrance heading (blue) and configure appropriately. For example a daily would be 1 interval on a daily frequency. You can select the time the job will run easily. ![Configure your internal and frequency](Screenshots/recurrence.png). Note: Do not try to take snapshots at < 5 minute intervals.
-2. Finally, you must configure your retention. For example, if you would like to keep the last 7 days and your schedule was set to an interval of 1 with frequency of daily, then set the User Configuration: Snapshot Retention to 7. Likewise if you were taking hourly snapshots and wanted the last 48 hours, then set User Configuration: Snapshot Retention to 48. ![Snapshot Retention](Screenshots/snapshotRetention.png)
-
 ### Troubleshooting
 
 Here are some known errors you may encounter commonly caused by misconfiguration
