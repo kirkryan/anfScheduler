@@ -7,15 +7,14 @@ A simple to use Azure NetApp Files snapshot scheduler built upon Azure Logic App
 This Azure Netapp Files snapshot scheduler allows you to take snapshots at any supported interval i.e. daily, hourly. etc and automatically manages snapshot retention for the specified number of snapshots.
 
 ## Philosophy of operation
-The scheduler will create snapshots at the interval and frequency that you specify in the configuration. When the retention limit is reached, the scheduler will remove the oldest snapshot on that volume. 
+The scheduler will create snapshots at the interval and frequency that you specify in the configuration. When the retention limit is reached, the scheduler will remove the oldest snapshot on that volume. Each logic app will act only upon snapshots it generates within its defined scope, therefore it is possible to have multiple logic app schedulers (i.e. one for hourly, one for daily, one for weekly) and they will not conflict with one another.
 
 ## Installation & Configuration
 ### Installation
-Simply clone/download this repository. It contains the ARM template and deployment scripts in order to deploy ANF Scheduler to your environment. The deployment can be run with deploy.ps1 (for Azure Cloud Shell), deploy-AzModule.ps1 (for Azure Powershell) or deploy.sh (Azure CLI).
-![Install Directory Files](Screenshots/InstallFilesScreenshot.png)
 
-Note: You may change the name and location of the Azure logic app by editing the appropriate values in the parameters.json
-![Parameters](Screenshots/parameters.png)
+Deployment couldn't be simpler - simply click the button below to deploy the logic app into your environment:
+
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkirkryan%2FanfScheduler%2Fmaster%2Ftemplate.json)
 
 ### Configuration
 Once you have installed the template you **must** configure the anfScheduler logic app to be able to access your Azure NetApp Files resources. Please note, that anfScheduler has **no access to your data** and operates entirely at the management API level.
@@ -58,12 +57,11 @@ Once you have the above information to hand you will need to populate those valu
 
 Here are some known errors you may encounter commonly caused by misconfiguration
 
-#### WorkflowManagedServiceIdentityNotSpecified. The workflow 'Scheduler-ANF-Snapshots-v1' does not have managed service identity enabled. See [https://aka.ms/logicapps-msi](https://aka.ms/logicapps-msi) for details.
+#### WorkflowManagedServiceIdentityNotSpecified. The workflow 'Scheduler-ANF-Snapshots-v2' does not have managed service identity enabled. See [https://aka.ms/logicapps-msi](https://aka.ms/logicapps-msi) for details.
 Answer: You have not enabled the managed identity in Step 2. Please enable and try again
 
 #### The term "Login-AzureRmAccount is not recognized".....
 Answer: You are using PowerShell module > 2.0.69 i.e. 2.4.0. Use the deploy-AzModule.ps1 instead of deploy.ps1.
-
 
 #### Connect-AzAccount : Access to the path '/Users/yourusername/.Azure/AzureRmContext.json' is denied.
 Answer: You do not have sufficient user priviliges on your client. Restart PowerShell as admin (windows) or sudo (linux/unix/macOS) and try again.
