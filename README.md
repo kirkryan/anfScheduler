@@ -17,16 +17,25 @@ Deployment couldn't be simpler - simply click the button below to deploy the log
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkirkryan%2FanfScheduler%2Fmaster%2Ftemplate.json)
 
 ### Configuration
-Once you have installed the template you **must** configure the anfScheduler logic app to be able to access your Azure NetApp Files resources. Please note, that anfScheduler has **no access to your data** and operates entirely at the management API level.
+Once you lauch the template above, you **must** configure the anfScheduler logic app to be able to access your Azure NetApp Files resources. Please note, that anfScheduler has **no access to your data** and operates entirely at the management API level.
+
+You will be presented with the following deploymeny prompt:
+![Deployment Prompt](Screenshots/deployment.png)
 
 You will need the following information about the volume for which you would like to schedule snapshots for:
 
- 1. Subscription ID - The Azure Subscription ID containing your ANF services
- 2. NetApp Account - The name of your Azure NetApp Files account that you provision your capacity pools and volumes within. ![In this example my NetApp account names are ANF-NE and ANF-WE](Screenshots/anfAccountScreenshot.png)
- 3. Resource Group - The resource group name your ANF volume is deployed within
- 4. Capacity Pool - The capacity pool name your ANF volume is deployed within
- 5. Volume Name - The name of the volume you would like ANF Scheduler to manage snapshot creation and retention for.
- 6. Retention - The amount of snapshots you would like to retain
+ 1. ANF Scheduler Name - The name of the scheduler to deploy. It is recommened to follow the Scheduler-ANF-Snapshots-v2- followed by your custom naming such as daily/hourly/etc
+ 2. Subscription ID - The Azure Subscription ID containing your ANF services (i.e. f3a13d61-d1d9-4f12-b2j3-1baa96w7e1bc)
+ 3. NetApp Account - The name of your Azure NetApp Files account that you provision your capacity pools and volumes within
+ 4. Resource Group - The resource group name your ANF volume is deployed within
+ 5. Capacity Pool - The capacity pool name your ANF volume is deployed within
+ 6. Volumes - The list of volume(s) you would like ANF Scheduler to manage snapshot creation and retention for. **This must be an array** i.e. ["volname1", "volname2"]
+ 7. Scheduled Frequency - How often you want to run the scheduler (i.e. one of the following: Month, Week, Day, Hour, Minute)
+ 8. Scheduled Interval - How often to run the interval
+ 9. Retention - The amount of snapshots you would like to retain
+
+
+## Assigning Permissions to the ANF scheduler
 
 #### Step 1 : Configure the logic app managed identity
 Once you have the above information to hand you will need to populate those values into the logic app as follows:
