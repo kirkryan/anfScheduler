@@ -35,16 +35,16 @@
       "type": "String"
     },
     "Scheduled Interval": {
-      "defaultValue": 1,
-      "type": "int"
+      "defaultValue": "1",
+      "type": "String"
     },
     "Scheduled Start Time": {
       "defaultValue": "2019-06-27T00:00:00Z",
       "type": "String"
     },
     "Snapshot Retention": {
-      "defaultValue": 7,
-      "type": "int"
+      "defaultValue": "7",
+      "type": "String"
     }
   },
   "variables": {},
@@ -64,7 +64,7 @@
             "Recurrence": {
               "recurrence": {
                 "frequency": "[parameters('Scheduled Frequency')]",
-                "interval": "[parameters('Scheduled Interval')]",
+                "interval": "[int(parameters('Scheduled Interval'))]",
                 "startTime": "[parameters('Scheduled Start Time')]",
                 "timeZone": "GMT Standard Time"
               },
@@ -854,7 +854,7 @@
                   {
                     "name": "snapshotRetention",
                     "type": "Integer",
-                    "value": "[parameters('Snapshot Retention')]"
+                    "value": "[int(parameters('Snapshot Retention'))]"
                   }
                 ]
               }
