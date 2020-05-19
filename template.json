@@ -26,6 +26,10 @@
       "defaultValue": [],
       "type": "Array"
     },
+    "Snapshot Prefix": {
+      "defaultValue": "daily",
+      "type": "String"
+    },
     "Scheduled Frequency": {
       "defaultValue": "Day",
       "type": "String"
@@ -835,7 +839,7 @@
                   {
                     "name": "snapshotPrefix",
                     "type": "string",
-                    "value": "[parameters('Scheduled Frequency')]"
+                    "value": "[parameters('Snapshot Prefix')]"
                   }
                 ]
               }
