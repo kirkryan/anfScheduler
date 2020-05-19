@@ -3,6 +3,10 @@ Created by Kirk Ryan - [@kirk__ryan](https://twitter.com/kirk__ryan)
 
 A simple to use Azure NetApp Files snapshot scheduler built upon Azure Logic Apps
 
+## Change Log
+2.0 - Add support for multiple volumes & scoping (a scheduler will only act upon it's own snapshots)
+1.0 - Support for single volume per scheduler
+
 ## Introduction
 This Azure Netapp Files snapshot scheduler allows you to take snapshots at any supported interval i.e. daily, hourly. etc and automatically manages snapshot retention for the specified number of snapshots.
 
