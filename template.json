@@ -36,7 +36,7 @@
     },
     "Scheduled Interval": {
       "defaultValue": 1,
-      "type": "Integer"
+      "type": "int"
     },
     "Scheduled Start Time": {
       "defaultValue": "2019-06-27T00:00:00Z",
@@ -44,7 +44,7 @@
     },
     "Snapshot Retention": {
       "defaultValue": 7,
-      "type": "Integer"
+      "type": "int"
     }
   },
   "variables": {},
