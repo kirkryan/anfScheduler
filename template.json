@@ -18,6 +18,10 @@
       "defaultValue": "",
       "type": "String"
     },
+    "Resource Location": {
+      "defaultValue": "westeurope",
+      "type": "String"
+    }
     "Capacity Pool": {
       "defaultValue": "",
       "type": "String"
@@ -53,7 +57,7 @@
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
       "name": "[parameters('ANF Scheduler Name')]",
-      "location": "westeurope",
+      "location": "[parameters('Resource Location')]",
       "properties": {
         "state": "Enabled",
         "definition": {
