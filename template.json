@@ -809,7 +809,7 @@
                   {
                     "name": "netappAccount",
                     "type": "String",
-                    "value": "[parameters('Subscription ID')]"
+                    "value": "[parameters('NetApp Account Name')]"
                   }
                 ]
               }
