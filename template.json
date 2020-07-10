@@ -2,8 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "ANF Scheduler Name": {
-      "defaultValue": "Scheduler-ANF-Snapshots-v2-Daily",
+    "workflows_Scheduler_ANF_Snapshots_v2_name": {
+      "defaultValue": "Scheduler-ANF-Snapshots-v2",
       "type": "String"
     },
     "Subscription ID": {
@@ -21,13 +21,13 @@
     "Resource Location": {
       "defaultValue": "westeurope",
       "type": "String"
-    }
+    },
     "Capacity Pool": {
       "defaultValue": "",
       "type": "String"
     },
     "Volumes": {
-      "defaultValue": [],
+      "defaultValue": ["vol01", "vol02"],
       "type": "Array"
     },
     "Snapshot Prefix": {
@@ -56,7 +56,7 @@
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
-      "name": "[parameters('ANF Scheduler Name')]",
+      "name": "[parameters('workflows_Scheduler_ANF_Snapshots_v2_name')]",
       "location": "[parameters('Resource Location')]",
       "properties": {
         "state": "Enabled",
@@ -134,7 +134,7 @@
                       }
                     },
                     "method": "PUT",
-                    "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}/snapshots/@{variables('snapshotPrefix')}-@{ticks(utcNow())}?api-version=2019-11-01"
+                    "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}/snapshots/@{variables('snapshotName')}?api-version=2019-11-01"
                   }
                 },
                 "HTTP_-_Get_snapshots_on_the_target_volume": {
@@ -506,6 +506,16 @@
                             "method": "DELETE",
                             "uri": "https://management.azure.com/subscriptions/@{variables('subscriptionId')}/resourceGroups/@{variables('resourceGroup')}/providers/Microsoft.NetApp/netAppAccounts/@{variables('netappAccount')}/capacityPools/@{variables('capacityPool')}/volumes/@{items('For_each_ANF_volume_-_Run_logic')}/snapshots/@{first(variables('scopedSnapshotArray'))}?api-version=2019-11-01"
                           }
+                        },
+                        "Set_variable_-_Clear_scoped_snapshotsArray": {
+                          "runAfter": {
+                            "HTTP": ["Succeeded"]
+                          },
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "scopedSnapshotArray",
+                            "value": []
+                          }
                         }
                       },
                       "runAfter": {
@@ -635,18 +645,6 @@
                         }
                       }
                     },
-                    "Set_variable_-_Clear_scoped_snapshotsArray": {
-                      "runAfter": {
-                        "Condition_-_Check_if_snapshots_exceed_retention": [
-                          "Succeeded"
-                        ]
-                      },
-                      "type": "SetVariable",
-                      "inputs": {
-                        "name": "scopedSnapshotArray",
-                        "value": []
-                      }
-                    },
                     "Set_variable_-_Set_in_scope_snapshots_only": {
                       "runAfter": {
                         "Filter_array_-_Scope_snapshot_actions_to_matching_scheduler_prefix_only": [
@@ -699,7 +697,7 @@
                 }
               },
               "runAfter": {
-                "Initialize_variable_-_errorMessage_[DO_NOT_EDIT]": [
+                "Initialize_variable_-_snapshotName_[DO_NOT_EDIT]": [
                   "Succeeded"
                 ]
               },
@@ -767,6 +765,23 @@
                     "name": "snapshotItem",
                     "type": "integer",
                     "value": 0
+                  }
+                ]
+              }
+            },
+            "Initialize_variable_-_snapshotName_[DO_NOT_EDIT]": {
+              "runAfter": {
+                "Initialize_variable_-_errorMessage_[DO_NOT_EDIT]": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "snapshotName",
+                    "type": "string",
+                    "value": "@{variables('snapshotPrefix')}-@{ticks(utcNow())}"
                   }
                 ]
               }
